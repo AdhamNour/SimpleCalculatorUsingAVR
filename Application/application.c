@@ -32,14 +32,14 @@ void APPLICATION_setup() {
 	KEYPAD_init();
 	LCD_init();
 	LCD_displayString("Adham Nour ElWfa");
-	_delay_ms(250);
+	_delay_ms(500);
 	LCD_displayStringRowColumn(1, 0, "simpleCalculator");
-	_delay_ms(250);
+	_delay_ms(500);
 
 	LCD_clearScreen();
 	LCD_displayString("Enter Your");
 	LCD_displayStringRowColumn(1, 0, "Calculation Now");
-	_delay_ms(250);
+	_delay_ms(500);
 	LCD_clearScreen();
 
 }
@@ -79,8 +79,11 @@ void APPLICATION_loop() {
 }
 static void performCalc() {
 	uint8 operatorLocations[16];
+	sint16 operands[17];
 	for (int i = 0; i < 16; i++)
-		operatorLocations[i] = 255;
+		operands[i] = -1;
+	for (int i = 0; i < 16; i++)
+			operatorLocations[i] = 255;
 	for (int i = 0, j = 0; i < 16; i++) {
 		if (buffer[i] == '+' || buffer[i] == '-' || buffer[i] == '*'
 				|| buffer[i] == '%') {
@@ -93,23 +96,30 @@ static void performCalc() {
 		LCD_displayStringRowColumn(1, 0, "Op in indx=0");
 		return;
 	}
+	/*Parsing*/
 	uint8 temp[16] = { '\0' };
 	substr(buffer, temp, 0, operatorLocations[0]);
-	LCD_displayStringRowColumn(1, 0, temp);
-	_delay_ms(250);
-	for (int i = 1; i < 16; i++) {
+	operands[0] = atoi(temp);
+	for (int i = 1, j = 1; i < 16; i++) {
 		if (operatorLocations[i] == 255) {
 			substr(buffer, temp, operatorLocations[i - 1] + 1, 16);
-			LCD_displayStringRowColumn(1, 0, temp);
-			_delay_ms(250);
+			operands[j] = atoi(temp);
+			j++;
 			break;
 		} else {
 			substr(buffer, temp, operatorLocations[i - 1] + 1,
 					operatorLocations[i]);
-			LCD_displayStringRowColumn(1, 0, temp);
-			_delay_ms(250);
+			operands[j] = atoi(temp);
+			j++;
 
 		}
+	}
+	for (int i=0;i<17;i++) {
+		if(operands[i]==-1)break;
+		itoa(operands[i],temp,10);
+		LCD_displayStringRowColumn(1, 0, temp);
+		_delay_ms(500);
+
 	}
 
 }
